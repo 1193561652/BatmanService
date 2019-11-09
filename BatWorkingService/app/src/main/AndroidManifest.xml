@@ -37,7 +37,7 @@
 <!--            android:process=":remote"-->
             <!--            android:process=":remoteProcess"-->
             <intent-filter>
-                <action android:name="com.example.batservice..WorkingService" />
+                <action android:name="com.example.batservice.WorkingService" />
             </intent-filter>
         </service>
 
