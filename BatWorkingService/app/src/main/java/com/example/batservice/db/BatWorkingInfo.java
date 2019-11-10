@@ -1,7 +1,5 @@
 package com.example.batservice.db;
 
-import android.provider.BaseColumns;
-
 public class BatWorkingInfo {
 //    public static abstract class DogTable implements BaseColumns {
 //        public static final String TABLE_NAME = "dog";

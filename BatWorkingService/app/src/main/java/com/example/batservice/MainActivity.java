@@ -9,14 +9,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 
-import com.example.batservice.db.BatWorkingInfo;
-import com.example.batservice.db.DatabaseAdaper;
+import com.example.batservice.R;
 
 import org.keplerproject.luajava.LuaState;
 import org.keplerproject.luajava.LuaStateFactory;
@@ -32,7 +30,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
-    com.example.batservice.WorkingServiceConnection wsConnection = new com.example.batservice.WorkingServiceConnection();
+    WorkingServiceConnection wsConnection = new WorkingServiceConnection();
 
     Button btn = null;
     Button btn2 = null;
@@ -51,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
         Intent startIntent = new Intent();
         ComponentName componentName = new ComponentName("com.example.batservice", "com.example.batservice.WorkingService");
         startIntent.setComponent(componentName);
-        startForegroundService(startIntent);
-        boolean bSec = bindService(startIntent, wsConnection, BIND_AUTO_CREATE);
+        getApplication().startForegroundService(startIntent);
+        boolean bSec = getApplication().bindService(startIntent, wsConnection, BIND_AUTO_CREATE);
 
         btn = (Button)findViewById(R.id.button);
         btn2 = (Button)findViewById(R.id.button2);
@@ -60,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
         textView = (TextView)findViewById(R.id.textView);
         textView2 = (TextView)findViewById(R.id.textView2);
-
-
 
 
         btn.setOnClickListener(new View.OnClickListener() {

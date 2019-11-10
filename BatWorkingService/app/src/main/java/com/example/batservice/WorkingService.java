@@ -9,7 +9,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,31 +19,26 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 
-import com.example.administrator.http.HttpURLConnectionUtil;
+import com.example.batservice.db.BatWorkingInfo;
+import com.example.batservice.db.DatabaseAdaper;
+import com.example.batservice.http.HttpURLConnectionUtil;
 
 import org.keplerproject.luajava.LuaState;
 import org.keplerproject.luajava.LuaStateFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.ConnectException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import com.example.batservice.IReqWorkingAidlInterface;
-import com.example.batservice.db.BatWorkingInfo;
-import com.example.batservice.db.DatabaseAdaper;
+
+import com.example.batservice.R;
 
 import static android.app.PendingIntent.getActivity;
-import static android.os.Build.ID;
 
 public class WorkingService extends Service {
     RequsetWorking mBind = new RequsetWorking();
@@ -61,8 +55,6 @@ public class WorkingService extends Service {
         Log.v("RequsetWorking", "onCreate");
         super.onCreate();
 
-        //mReqRun = new ReqRun(mBind, this);
-        //mThread = new Thread(mReqRun);
 
         this.setForeground();
 
@@ -162,12 +154,6 @@ public class WorkingService extends Service {
             wakeLock.release();
             wakeLock = null;
         }
-//        try {
-//            mReqRun.mStop = true;
-//            mThread.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
 
     public static class ReqThread extends Thread {
@@ -191,8 +177,6 @@ public class WorkingService extends Service {
 
         @Override
         public void run() {
-            //super.run();
-            //ReqWorking();
             Looper.prepare();
 
             mHandler = new Handler() {
@@ -265,15 +249,6 @@ public class WorkingService extends Service {
             Message msg = new Message();
             msg.what = ReqThread.MSE_CREATE;
             mHandler.sendMessage(msg);
-//            mHandler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Message msg = new Message();
-//                    msg.what = ReqThread.MSG_TIMER;
-//                    mHandler.sendMessage(msg);
-//                }
-//            }, 10 * 1000);
-
             mBind.setThreadHandler(mHandler);
             Looper.loop();
         }
@@ -311,11 +286,7 @@ public class WorkingService extends Service {
                 return false;
             }
             lua.openLibs();
-            //int ret = lua.LloadFile("/sdcard/download/test.lua");
-            //int ret = lua.LdoString(readAssetsTxt(mContext, "test.lua"));
-            //int ret = lua.LdoString(readFileTxt("/sdcard/download/test.lua"));
             String fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/WorkingService/test.lua";
-            //fileName = "/storage/emulated/0/WorkingService/test.lua";
             int ret = lua.LdoString(readFileTxt(fileName));
             if(ret != 0) {
                 if(mBind != null)
@@ -395,96 +366,6 @@ public class WorkingService extends Service {
 
     }
 
-//    public class ReqRun implements Runnable {
-//        RequsetWorking mBind = null;
-//        Context mContext = null;
-//        public boolean mStop = false;
-//        public ReqRun(RequsetWorking bind, Context context) {
-//            mBind = bind;
-//            mContext = context;
-//        }
-//        @Override
-//        public void run() {
-//            while(!mStop) {
-//
-//                LuaState lua = LuaStateFactory.newLuaState();
-//                //if(lua == null)
-//                lua.openLibs();
-//                //int ret = lua.LloadFile("/sdcard/download/test.lua");
-//                //int ret = lua.LdoString(readAssetsTxt(mContext, "test.lua"));
-//                //int ret = lua.LdoString(readFileTxt("/sdcard/download/test.lua"));
-//                String fileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/WorkingService/test.lua";
-//                //fileName = "/storage/emulated/0/WorkingService/test.lua";
-//                int ret = lua.LdoString(readFileTxt(fileName));
-//                lua.getGlobal("getUrl");
-//                ret = lua.pcall(0, 1, 0);
-//                String url = lua.toString(-1);
-//                lua.pop(1);
-//
-//                String strReq = HttpURLConnectionUtil.get(url, new HashMap<String, Object>() );
-//
-//
-//                lua.getGlobal("needWorking");
-//                lua.pushString(strReq);
-//                ret = lua.pcall(1, 4, 0);
-//                //String currTime = lua.toString(-1);
-//                String time = lua.toString(-1);
-//                String type = lua.toString(-2);
-//                String name = lua.toString(-3);
-//                String needWorking = lua.toString(-4);
-//                lua.pop(4);
-//                lua.close();
-//
-//                if(mBind != null)
-//                    mBind.setResult(needWorking, type, time, name, System.currentTimeMillis());
-//
-//                for(int i=0;i < 30 * 60 * 10 && !mStop; i++) {
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }
-//
-//        public String readAssetsTxt(Context context, String fileName) {
-//            try {
-//                InputStream is = context.getAssets().open(fileName);
-//                int size = is.available();
-//                // Read the entire asset into a local byte buffer.
-//                byte[] buffer = new byte[size];
-//                is.read(buffer);
-//                is.close();
-//                // Convert the buffer into a string.
-//                String text = new String(buffer, "utf-8");
-//                // Finally stick the string into the text view.
-//                return text;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return "err";
-//        }
-//
-//        public String readFileTxt(String fileName) {
-//            try {
-//                InputStream is = new FileInputStream(fileName);
-//                int size = is.available();
-//                byte[] buffer = new byte[size];
-//                is.read(buffer);
-//                is.close();
-//                String text = new String(buffer, "utf-8");
-//                return text;
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return "error";
-//        }
-//
-//    }
-
-
     public class RequsetWorking extends IReqWorkingAidlInterface.Stub {
         public class WorkingData{
             public long updateTime = 0;
@@ -514,8 +395,6 @@ public class WorkingService extends Service {
             }
         }
 
-        //List<IRspWorkingAidlInterface> callBackList = new ArrayList<>();
-        //String mNeedWorking = "non";
         WorkingData mWorkingData = new WorkingData();
         ReqError mReqError = new ReqError();
 
